@@ -35,9 +35,9 @@ export default {
         })
       });
 
-      const [{ isAuthenticated, status, message, role, username }] = await result.json();
-      this.$store.commit("authenticate", { isAuthenticated, status, message, role, username });
-      if (!isAuthenticated) {
+      const [{ authenticated, status, error, role, username }] = await result.json();
+      this.$store.commit("authenticate", { authenticated, status, error, role, username });
+      if (!authenticated) {
         this.$store.commit("resetVisibleTeam");
         this.$store.commit("resetCurrentPatient");
       }

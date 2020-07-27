@@ -1,7 +1,7 @@
 <template>
   <div class="col-12">
     <footer>
-      <span class="align-left" v-text="$store.getters.getMessage"></span>
+      <span class="align-left" v-text="$store.getters.getError"></span>
       <span class="align-right" v-html="footer"></span>
       <div class="clear-both"></div>
     </footer>

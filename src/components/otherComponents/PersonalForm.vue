@@ -27,7 +27,7 @@
         <br/>
         <select v-model="medicalIssue" id="medicalIssue" required>
           <option value="" disabled selected hidden>Medical issue: </option>
-          <option v-for="{ ID, name } in $store.getters.getMedicalIssues" :key="ID" :value="name" v-text="name"></option>
+          <option v-for="{ ID, name } in $store.getters.getMedicalIssues" :key="ID" :value="{ ID, name }" v-text="name"></option>
         </select>
       </div>
 
@@ -37,7 +37,7 @@
         <br/>
         <select v-model="priority" id="priority" required>
           <option value="" disabled selected hidden>Priority: </option>
-          <option v-for="{ ID, name } in $store.getters.getPriorities" :key="ID" :value="name" v-text="name"></option>
+          <option v-for="{ ID, name } in $store.getters.getPriorities" :key="ID" :value="{ ID, name }" v-text="name"></option>
         </select>
       </div>
 
@@ -47,7 +47,7 @@
         <br/>
         <select v-model="emergencyTeam" id="emergencyTeam" required>
           <option value="" disabled selected hidden>Assign to: </option>
-          <option v-for="{ ID, name } in $store.getters.getEmergencyTeamsCompetentToDealWith" :key="ID" :value="name" v-text="name"></option>
+          <option v-for="{ ID, name } in $store.getters.getEmergencyTeamsCompetentToDealWith" :key="ID" :value="{ ID, name }" v-text="name"></option>
         </select>
       </div>
 
@@ -95,7 +95,7 @@ export default {
   watch: {
     async medicalIssue (newValue) {
       // show all teams after reset
-      if (newValue === "") {
+      if (JSON.stringify(newValue) === JSON.stringify({})) {
         this.$store.commit("updateEmergencyTeamsCompetentToDealWith", this.$store.getters.getEmergencyTeams);
       } else {
         this.$store.commit("updateEmergencyTeamsCompetentToDealWith", await this.getEmergencyTeamsCompetentToDealWith(newValue));
@@ -128,7 +128,7 @@ export default {
       return await result.json();
     },
     async getEmergencyTeamsCompetentToDealWith (medicalIssue) {
-      const result = await fetch(`/api/emergency-teams/competent-to-deal-with/${medicalIssue}`);
+      const result = await fetch(`/api/emergency-teams/competent-to-deal-with/${medicalIssue.name}`);
       return await result.json();
     },
     async onAssign () {

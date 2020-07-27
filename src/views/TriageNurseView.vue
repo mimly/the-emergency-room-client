@@ -34,7 +34,7 @@ export default {
   },
   watch: {
     emergencyTeamsCompetentToDealWith (newValue) {
-      this.$store.commit("updateCurrentPatientEmergencyTeam", "");
+      this.$store.commit("updateCurrentPatientEmergencyTeam", undefined);
       this.$root.apiSocket.emit("medicationTime", {
         emergencyTeamsCompetentToDealWith: newValue,
         emergencyTeam: this.$store.getters.getCurrentPatient.emergencyTeam

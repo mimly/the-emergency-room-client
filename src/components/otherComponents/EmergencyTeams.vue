@@ -4,8 +4,8 @@
 
     <div>
       <div class="tab">
-        <button v-for="{ ID, name} in emergencyTeamsWithPatients" :key="ID"
-                @click="onClick(name)"
+        <button v-for="{ ID, name } in emergencyTeamsWithPatients" :key="ID"
+                @click="onClick({ ID, name })"
                 v-show="$store.getters.getEmergencyTeamsCompetentToDealWith.some((x) => x.name === name)"
                 v-text="name">
         </button>
@@ -20,8 +20,8 @@
               <th v-for="x in headers" :key="x" v-text="x"></th>
             </tr>
             <tr v-for="{ ID, firstName, lastName, priority, waitingTime } in patients" :key="ID"
-                :class="{'flare': ID === '-', 'blink': (waitingTime === 0) && isBlinking}">
-              <th v-for="x in [ID, firstName, lastName, priority, waitingTime]" :key="x" v-text="x"></th>
+                :class="{'flare': ID === -1, 'blink': (waitingTime === 0) && isBlinking}">
+              <th v-for="x in [ID, firstName, lastName, priority.name, waitingTime]" :key="x" v-text="x"></th>
             </tr>
           </table>
         </div>
@@ -48,18 +48,22 @@ export default {
       const self = this;
       const emergencyTeamsWithPatients = JSON.parse(JSON.stringify(this.$store.getters.getEmergencyTeamsWithPatients));
       emergencyTeamsWithPatients.map((x) => {
-        if (self.$store.getters.getUsername === "TNUR") x.patients.push(self.$store.getters.getCurrentPatient);
-        x.patients.sort((y, z) => self.$store.getters.getPriorities.map((p) => p.name).indexOf(z.priority) - self.$store.getters.getPriorities.map((p) => p.name).indexOf(y.priority));
+        if (self.$store.getters.getUsername === "TNUR") {
+          self.$store.commit("updateCurrentPatientID", -1);
+          self.$store.commit("updateCurrentPatientWaitingTime", -1);
+          x.patients.push(self.$store.getters.getCurrentPatient);
+        }
+        x.patients.sort((y, z) => self.$store.getters.getPriorities.map((p) => p.name).indexOf(z.priority.name) - self.$store.getters.getPriorities.map((p) => p.name).indexOf(y.priority.name));
       });
       return emergencyTeamsWithPatients;
     }
   },
   methods: {
     onClick (emergencyTeam) {
-      if (this.$store.getters.getVisibleTeam === emergencyTeam) {
-        this.$store.commit("updateVisibleTeam", "");
+      if (this.$store.getters.getVisibleTeam === emergencyTeam.name) {
+        this.$store.commit("updateVisibleTeam", undefined);
       } else {
-        this.$store.commit("updateVisibleTeam", emergencyTeam);
+        this.$store.commit("updateVisibleTeam", emergencyTeam.name);
       }
     }
   },

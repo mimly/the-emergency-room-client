@@ -8,26 +8,26 @@ Vue.config.devtools = true;
 export default new Vuex.Store({
   state: {
     auth: {
-      isAuthenticated: false,
+      authenticated: false,
       status: 401,
-      message: "Unauthorized",
+      error: "Unauthorized",
       role: undefined,
       username: undefined
     },
-    visibleTeam: "",
+    visibleTeam: undefined,
     currentPatient: {
-      ID: "-",
-      firstName: "",
-      lastName: "",
-      sex: "",
-      age: "",
-      medicalIssue: "",
-      priority: "",
-      emergencyTeam: "",
-      waitingTime: "-",
+      ID: undefined,
+      firstName: undefined,
+      lastName: undefined,
+      sex: undefined,
+      age: undefined,
+      medicalIssue: {},
+      priority: {},
+      emergencyTeam: {},
+      waitingTime: undefined,
       drugs: [],
       medicalProcedures: [],
-      outcome: ""
+      outcome: {}
     },
     medicalIssues: [],
     priorities: [],
@@ -41,37 +41,40 @@ export default new Vuex.Store({
   mutations: {
     invalidate (state) {
       state.auth = {
-        isAuthenticated: false,
+        authenticated: false,
         status: 401,
-        message: "Unauthorized",
+        error: "Unauthorized",
         role: undefined,
         username: undefined
       };
     },
-    authenticate (state, { isAuthenticated, status, message, role, username }) {
-      state.auth = { isAuthenticated, status, message, role, username };
+    authenticate (state, { authenticated, status, error, role, username }) {
+      state.auth = { authenticated, status, error, role, username };
     },
     resetVisibleTeam (state) {
-      state.visibleTeam = "";
+      state.visibleTeam = undefined;
     },
     updateVisibleTeam (state, visibleTeam) {
       state.visibleTeam = visibleTeam;
     },
     resetCurrentPatient (state) {
       state.currentPatient = {
-        ID: "-",
-        firstName: "",
-        lastName: "",
-        sex: "",
-        age: "",
-        medicalIssue: "",
-        priority: "",
-        emergencyTeam: "",
-        waitingTime: "-",
+        ID: undefined,
+        firstName: undefined,
+        lastName: undefined,
+        sex: undefined,
+        age: undefined,
+        medicalIssue: {},
+        priority: {},
+        emergencyTeam: {},
+        waitingTime: undefined,
         drugs: [],
         medicalProcedures: [],
-        outcome: ""
+        outcome: {}
       };
+    },
+    updateCurrentPatient (state, patient) {
+      Object.assign(state.currentPatient, patient);
     },
     updateCurrentPatientID (state, ID) {
       state.currentPatient.ID = ID;
@@ -96,6 +99,9 @@ export default new Vuex.Store({
     },
     updateCurrentPatientEmergencyTeam (state, emergencyTeam) {
       state.currentPatient.emergencyTeam = emergencyTeam;
+    },
+    updateCurrentPatientWaitingTime (state, waitingTime) {
+      state.currentPatient.waitingTime = waitingTime;
     },
     updateCurrentPatientDrugs (state, drugs) {
       state.currentPatient.drugs = drugs;
@@ -132,8 +138,8 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    isAuthenticated: (state) => state.auth.isAuthenticated,
-    getMessage: (state) => state.auth.message,
+    isAuthenticated: (state) => state.auth.authenticated,
+    getError: (state) => state.auth.error,
     getRole: (state) => state.auth.role,
     getUsername: (state) => state.auth.username,
     getVisibleTeam: (state) => state.visibleTeam,

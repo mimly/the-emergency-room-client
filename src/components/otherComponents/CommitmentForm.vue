@@ -9,7 +9,7 @@
         <br/>
         <select v-model="drugs" id="drugs" multiple required>
           <option value="" disabled selected hidden>Drugs: </option>
-          <option v-for="{ ID, name } in $store.getters.getDrugs" :key="ID" :value="name" v-text="name"></option>
+          <option v-for="{ ID, name } in $store.getters.getDrugs" :key="ID" :value="{ ID, name }" v-text="name"></option>
         </select>
       </div>
 
@@ -19,7 +19,7 @@
         <br/>
         <select v-model="medicalProcedures" id="medicalProcedures" multiple required>
           <option value="" disabled selected hidden>Medical procedures: </option>
-          <option v-for="{ ID, name } in $store.getters.getMedicalProcedures" :key="ID" :value="name" v-text="name"></option>
+          <option v-for="{ ID, name } in $store.getters.getMedicalProcedures" :key="ID" :value="{ ID, name }" v-text="name"></option>
         </select>
       </div>
 
@@ -29,7 +29,7 @@
         <br/>
         <select v-model="outcome" id="outcome" required>
           <option value="" disabled selected hidden>Outcome: </option>
-          <option v-for="{ ID, name } in $store.getters.getOutcomes" :key="ID" :value="name" v-text="name"></option>
+          <option v-for="{ ID, name } in $store.getters.getOutcomes" :key="ID" :value="{ ID, name }" v-text="name"></option>
         </select>
       </div>
 
@@ -72,13 +72,13 @@ export default {
       return await result.json();
     },
     async getPatientsFor (emergencyTeam) {
-      const result = await fetch(`/api/emergency-teams/${emergencyTeam}/patients`);
+      const result = await fetch(`/api/emergency-teams/${emergencyTeam.name}/patients`);
       return await result.json();
     },
     async getEmergencyTeamsWithPatients () {
       const emergencyTeamsWithPatients = [];
       for (const emergencyTeam of JSON.parse(JSON.stringify(this.$store.getters.getEmergencyTeamsCompetentToDealWith))) {
-        emergencyTeam.patients = await this.getPatientsFor(emergencyTeam.name);
+        emergencyTeam.patients = await this.getPatientsFor(emergencyTeam);
         emergencyTeamsWithPatients.push(emergencyTeam);
       }
       return emergencyTeamsWithPatients;
@@ -96,7 +96,7 @@ export default {
       return await result.json();
     },
     getMedicalProceduresFor: async (medicalIssue) => {
-      const result = await fetch(`/api/medical-procedures/for/${medicalIssue}`);
+      const result = await fetch(`/api/medical-procedures/for/${medicalIssue.name}`);
       return await result.json();
     },
     async onSubmit () {
@@ -116,8 +116,7 @@ export default {
       this.$scrollTo("#et", 800, { easing: [0.6, 0.8, 0.3, 1.9], offset: -60 });
       this.$store.commit("updateEmergencyTeamsWithPatients", await this.getEmergencyTeamsWithPatients());
       const currentPatient = (this.$store.getters.getEmergencyTeamsWithPatients)[0].patients[0];
-      this.$store.commit("updateCurrentPatientID", currentPatient.ID);
-      this.$store.commit("updateCurrentPatientMedicalIssue", currentPatient.medicalIssue);
+      this.$store.commit("updateCurrentPatient", currentPatient);
     }
   },
   async beforeMount () {
@@ -125,9 +124,7 @@ export default {
       this.$root.debug("ON -> assignment");
       this.$store.commit("updateEmergencyTeamsWithPatients", await this.getEmergencyTeamsWithPatients());
       const currentPatient = (this.$store.getters.getEmergencyTeamsWithPatients)[0].patients[0];
-      this.$store.commit("updateCurrentPatientID", currentPatient.ID);
-      this.$store.commit("updateCurrentPatientMedicalIssue", currentPatient.medicalIssue);
-      this.$store.commit("updateMedicalProcedures", await this.getMedicalProceduresFor(currentPatient.medicalIssue));
+      this.$store.commit("updateCurrentPatient", currentPatient);
     });
 
     const self = this;
@@ -135,10 +132,8 @@ export default {
     this.$store.commit("updateEmergencyTeamsCompetentToDealWith", this.$store.getters.getEmergencyTeams.filter((x) => x.name === self.$store.getters.getUsername));
     this.$store.commit("updateEmergencyTeamsWithPatients", await this.getEmergencyTeamsWithPatients());
     const currentPatient = (this.$store.getters.getEmergencyTeamsWithPatients)[0].patients[0];
-    this.$store.commit("updateCurrentPatientID", currentPatient.ID);
-    this.$store.commit("updateCurrentPatientMedicalIssue", currentPatient.medicalIssue);
+    this.$store.commit("updateCurrentPatient", currentPatient);
     this.$store.commit("updateDrugs", await this.getDrugs());
-    this.$store.commit("updateMedicalProcedures", await this.getMedicalProceduresFor(currentPatient.medicalIssue));
     this.$store.commit("updateOutcomes", await this.getOutcomes());
   }
 };

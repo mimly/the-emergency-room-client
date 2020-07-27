@@ -49,9 +49,9 @@ export default {
              * The problem is WHEN... (w/o reloading the entire page obviously)
              */
             const result = await fetch("/auth/isAuthenticated");
-            const [{ isAuthenticated, status, message, role, username }] = await result.json();
-            self.$store.commit("authenticate", { isAuthenticated, status, message, role, username });
-            if (!isAuthenticated) {
+            const [{ authenticated, status, error, role, username }] = await result.json();
+            self.$store.commit("authenticate", { authenticated, status, error, role, username });
+            if (!authenticated) {
               self.$store.commit("resetVisibleTeam");
               self.$store.commit("resetCurrentPatient");
             }
@@ -75,9 +75,9 @@ export default {
     });
 
     const result = await fetch("/auth/isAuthenticated");
-    const [{ isAuthenticated, status, message, role, username }] = await result.json();
-    this.$store.commit("authenticate", { isAuthenticated, status, message, role, username });
-    if (!isAuthenticated) {
+    const [{ authenticated, status, error, role, username }] = await result.json();
+    this.$store.commit("authenticate", { authenticated, status, error, role, username });
+    if (!authenticated) {
       this.$store.commit("resetVisibleTeam");
       this.$store.commit("resetCurrentPatient");
     }

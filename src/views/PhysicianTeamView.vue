@@ -37,7 +37,7 @@ export default {
     const self = this;
     this.$root.apiSocket.on("medicationTime", ({ emergencyTeamsCompetentToDealWith, emergencyTeam }) => {
       self.$root.debug("ON -> medicationTime");
-      if (emergencyTeam === "") {
+      if (emergencyTeam === undefined) {
         self.showOverlay = emergencyTeamsCompetentToDealWith.some((team) => team.name === self.$store.getters.getUsername);
       } else {
         self.showOverlay = emergencyTeam === self.$store.getters.getUsername;
